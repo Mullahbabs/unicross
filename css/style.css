@@ -497,7 +497,8 @@ img{
 
 .sec-title .text{
 	position:relative;
-	color:#666666;
+	color: #263120;
+	font-weight: 600;
 	font-size: 15px;
 	line-height: 1.8em;
 	margin-top: 10px;
@@ -3415,7 +3416,8 @@ img{
 
 .about-section .content-column .inner-column .text p{
 	position:relative;
-	color:#666666;
+	color:#111111;
+	font-weight: 600;
 	font-size: 15px;
 	line-height: 1.8em;
 	margin-bottom: 20px;
