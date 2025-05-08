@@ -8181,7 +8181,8 @@ img{
 
 .about-content-box .text{
 	position:relative;
-	color:#6d6565;
+	color: #111111;
+	font-weight: 600;
 	font-size:15px;
 	margin-bottom:42px;
 	line-height:1.9em;
