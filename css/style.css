@@ -3953,7 +3953,7 @@ img{
 	border:1px solid #eaeaea;
 	font-weight:700;
     padding: 15px 10px 15px 80px ;
-	color:#444444;
+	color:#1f8ceb;
 	text-transform:uppercase;
 	transition:all 500ms ease;
 	-moz-transition:all 500ms ease;
@@ -4041,7 +4041,8 @@ img{
 .accordion-box .block .content p{
 	margin-bottom:20px;
 	line-height:1.8em;
-	color:#777777;
+	color:#303030;
+	font-weight: 600;
 	font-size:15px;
 }
 
