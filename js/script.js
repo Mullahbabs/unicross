@@ -564,4 +564,80 @@
 		sortableMasonry();
 	});	
 
+	document.addEventListener('DOMContentLoaded', function() {
+		// Get the modal elements
+		const modal = document.getElementById('imageModal');
+		const modalImg = document.getElementById('modalImage');
+		const captionText = document.getElementById('caption');
+		const closeBtn = document.querySelector('.close');
+		const prevBtn = document.querySelector('.prev');
+		const nextBtn = document.querySelector('.next');
+		
+		// Get all view buttons
+		const viewButtons = document.querySelectorAll('.view-image');
+		let currentIndex = 0;
+		let imagesData = [];
+		
+		// Prepare images data array
+		viewButtons.forEach((btn, index) => {
+			imagesData.push({
+				src: btn.getAttribute('data-img'),
+				title: btn.getAttribute('data-title')
+			});
+			
+			// Add click handler
+			btn.addEventListener('click', function(e) {
+				e.preventDefault();
+				modal.style.display = 'block';
+				modalImg.src = this.getAttribute('data-img');
+				captionText.innerHTML = this.getAttribute('data-title');
+				currentIndex = index;
+			});
+		});
+		
+		// Close modal
+		closeBtn.addEventListener('click', function() {
+			modal.style.display = 'none';
+		});
+		
+		// Click outside image to close
+		modal.addEventListener('click', function(e) {
+			if (e.target === modal) {
+				modal.style.display = 'none';
+			}
+		});
+		
+		// Navigation functions
+		function showImage(index) {
+			if (index >= imagesData.length) { index = 0; }
+			if (index < 0) { index = imagesData.length - 1; }
+			
+			const imgData = imagesData[index];
+			modalImg.src = imgData.src;
+			captionText.innerHTML = imgData.title;
+			currentIndex = index;
+		}
+		
+		prevBtn.addEventListener('click', function() {
+			showImage(currentIndex - 1);
+		});
+		
+		nextBtn.addEventListener('click', function() {
+			showImage(currentIndex + 1);
+		});
+		
+		// Keyboard navigation
+		document.addEventListener('keydown', function(e) {
+			if (modal.style.display === 'block') {
+				if (e.key === 'ArrowLeft') {
+					showImage(currentIndex - 1);
+				} else if (e.key === 'ArrowRight') {
+					showImage(currentIndex + 1);
+				} else if (e.key === 'Escape') {
+					modal.style.display = 'none';
+				}
+			}
+		});
+	});
+
 })(window.jQuery);
