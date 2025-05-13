@@ -134,7 +134,10 @@ textarea{
 
 p{
 	position:relative;
-	line-height:1.8em;	
+	line-height:1.8em;
+	font-size: 16px;
+	text-align: justify;
+	color: #121212;	
 }
 
 .auto-container{
