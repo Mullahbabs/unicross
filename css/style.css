@@ -9685,79 +9685,206 @@ body.visible-menu-bar .fullscreen-menu{
 	padding-bottom:0px !important;
 }
 
-/* Modal/lightbox styling */
+/* Modal/lightbox styling - Base Styles */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  padding-top: 50px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.9);
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.9);
+    -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
 }
 
 .modal-content {
-  margin: auto;
-  display: block;
-  width: 60%;
-  height: 80%;
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 80vh;
+    object-fit: contain; /* Ensures images maintain aspect ratio */
 }
 
 #caption {
-  margin: auto;
-  display: block;
-  width: 80%;
-  max-width: 700px;
-  text-align: center;
-  color: #ccc;
-  padding: 10px 0;
-  height: 150px;
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: auto;
+    font-size: 1rem;
+    line-height: 1.4;
 }
 
 .close {
-  position: absolute;
-  top: 15px;
-  right: 35px;
-  color: #f1f1f1;
-  font-size: 40px;
-  font-weight: bold;
-  transition: 0.3s;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: #f1f1f1;
+    font-size: 35px;
+    font-weight: bold;
+    transition: 0.3s;
+    z-index: 1001;
 }
 
 .close:hover,
 .close:focus {
-  color: #bbb;
-  text-decoration: none;
-  cursor: pointer;
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .nav {
-  position: absolute;
-  top: 50%;
-  color: white;
-  font-size: 30px;
-  font-weight: bold;
-  padding: 16px;
-  margin-top: -25px;
-  user-select: none;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: 0.3s;
+    position: absolute;
+    top: 50%;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 12px;
+    margin-top: -25px;
+    user-select: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.3s;
+    z-index: 1001;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav:hover {
-  opacity: 1;
+    opacity: 1;
+    background-color: rgba(0,0,0,0.5);
 }
 
 .prev {
-  left: 0;
-  border-radius: 0 5px 5px 0;
+    left: 15px;
 }
 
 .next {
-  right: 0;
-  border-radius: 5px 0 0 5px;
+    right: 15px;
+}
+
+/* Responsive Breakpoints */
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+    .modal-content {
+        max-width: 85%;
+    }
+    .nav {
+        font-size: 28px;
+        width: 50px;
+        height: 50px;
+    }
+    #caption {
+        font-size: 1.1rem;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .modal-content {
+        max-width: 80%;
+    }
+    .close {
+        right: 35px;
+        font-size: 40px;
+    }
+    .nav {
+        font-size: 30px;
+        padding: 16px;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .modal-content {
+        max-width: 75%;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .modal-content {
+        max-width: 70%;
+    }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 575.98px) {
+    .modal {
+        padding-top: 30px;
+    }
+    .modal-content {
+        max-width: 95%;
+        max-height: 70vh;
+    }
+    .close {
+        top: 5px;
+        right: 10px;
+        font-size: 30px;
+    }
+    .nav {
+        font-size: 20px;
+        width: 36px;
+        height: 36px;
+        padding: 8px;
+    }
+    #caption {
+        width: 90%;
+        font-size: 0.9rem;
+        padding: 5px 0;
+    }
+}
+
+/* Very small devices (phones, 360px and below) */
+@media (max-width: 360px) {
+    .modal-content {
+        max-width: 98%;
+        max-height: 65vh;
+    }
+    .nav {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+}
+
+/* Tablet portrait mode */
+@media (min-width: 768px) and (max-width: 991.98px) and (orientation: portrait) {
+    .modal-content {
+        max-height: 75vh;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 600px) {
+    .modal {
+        padding-top: 10px;
+    }
+    .modal-content {
+        max-height: 90vh;
+    }
+    #caption {
+        height: auto;
+        padding: 5px 0;
+        font-size: 0.9rem;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .nav {
+        -webkit-font-smoothing: antialiased;
+    }
 }
