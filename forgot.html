@@ -1,0 +1,248 @@
+<script type="text/javascript">
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== "" && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: "base64" });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert sheet to JSON to filter blank rows
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          blankrows: false,
+          defval: "",
+        });
+        // Filter out blank rows (rows where all cells are empty, null, or undefined)
+        var filteredData = jsonData.filter((row) => row.some(filledCell));
+
+        // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+        var headerRowIndex = filteredData.findIndex(
+          (row, index) =>
+            row.filter(filledCell).length >=
+            filteredData[index + 1]?.filter(filledCell).length
+        );
+        // Fallback
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
+
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return "";
+      }
+    }
+    return gk_fileData[filename] || "";
+  }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unicross Staff Password Recovery</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: url("images/loginbg.jpg") no-repeat center center fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .container {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        margin: 1rem;
+      }
+      .logo {
+        display: block;
+        margin: 0 auto 1.5rem;
+        height: 64px;
+      }
+      h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: medium;
+        color: #374151;
+        margin-bottom: 0.25rem;
+      }
+      input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+      }
+      input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      .captcha-group {
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+      .captcha-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.1rem;
+        background: #f3f4f6;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        user-select: none;
+      }
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      button:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+      }
+      .login-link {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #2563eb;
+        text-decoration: none;
+      }
+      .login-link:hover {
+        text-decoration: underline;
+      }
+      .error-message {
+        display: none;
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #dc2626;
+      }
+      .success-message {
+        display: none;
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #15803d;
+      }
+      @media (max-width: 640px) {
+        .container {
+          margin: 1rem;
+          padding: 1.5rem;
+        }
+        h2 {
+          font-size: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="images/about.jpeg" alt="Unicross Logo" class="logo" />
+      <h2>Password Recovery</h2>
+      <form id="recoveryForm">
+        <div class="form-group">
+          <label for="email">Staff Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="captcha-group">
+          <label for="captchaInput"
+            >Enter CAPTCHA: <span id="captchaText"></span
+          ></label>
+          <input type="text" id="captchaInput" name="captchaInput" required />
+        </div>
+        <button type="submit">Send Recovery Link</button>
+      </form>
+      <a href="stafflogin.html" class="login-link">Back to Login</a>
+      <p id="errorMessage" class="error-message"></p>
+      <p id="successMessage" class="success-message"></p>
+    </div>
+    <script>
+      // Generate CAPTCHA
+      function generateCaptcha() {
+        const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let captcha = "";
+        for (let i = 0; i < 6; i++) {
+          captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        document.getElementById("captchaText").textContent = captcha;
+        return captcha;
+      }
+
+      let currentCaptcha = generateCaptcha();
+
+      document
+        .getElementById("recoveryForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const captchaInput = document.getElementById("captchaInput").value;
+          const errorMessage = document.getElementById("errorMessage");
+          const successMessage = document.getElementById("successMessage");
+
+          // Client-side validation
+          if (!email.includes("@unicross.edu.ng")) {
+            errorMessage.textContent =
+              "Please use a valid Unicross staff email";
+            errorMessage.style.display = "block";
+            successMessage.style.display = "none";
+            return;
+          }
+
+          if (captchaInput !== currentCaptcha) {
+            errorMessage.textContent = "Invalid CAPTCHA";
+            errorMessage.style.display = "block";
+            successMessage.style.display = "none";
+            currentCaptcha = generateCaptcha();
+            document.getElementById("captchaInput").value = "";
+            return;
+          }
+
+          // Simulate password recovery (replace with actual API call)
+          errorMessage.style.display = "none";
+          successMessage.textContent = "Recovery link sent to your email!";
+          successMessage.style.display = "block";
+          this.reset();
+          currentCaptcha = generateCaptcha();
+        });
+    </script>
+  </body>
+</html>

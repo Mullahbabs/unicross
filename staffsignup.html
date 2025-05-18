@@ -1,0 +1,355 @@
+<script type="text/javascript">
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== "" && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: "base64" });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert sheet to JSON to filter blank rows
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          blankrows: false,
+          defval: "",
+        });
+        // Filter out blank rows (rows where all cells are empty, null, or undefined)
+        var filteredData = jsonData.filter((row) => row.some(filledCell));
+
+        // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+        var headerRowIndex = filteredData.findIndex(
+          (row, index) =>
+            row.filter(filledCell).length >=
+            filteredData[index + 1]?.filter(filledCell).length
+        );
+        // Fallback
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
+
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return "";
+      }
+    }
+    return gk_fileData[filename] || "";
+  }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unicross Staff Signup</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: url("images/loginbg.jpg");
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .container {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 450px;
+        margin: 1rem;
+      }
+      .logo {
+        display: block;
+        margin: 0 auto 1.5rem;
+        height: 64px;
+      }
+      h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: medium;
+        color: #374151;
+        margin-bottom: 0.25rem;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+      }
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .checkbox-group input {
+        width: auto;
+        margin-right: 0.5rem;
+      }
+      .captcha-group {
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+      .captcha-text {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.1rem;
+        background: #f3f4f6;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        user-select: none;
+      }
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      button:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+      }
+      .login-link {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #2563eb;
+        text-decoration: none;
+      }
+      .login-link:hover {
+        text-decoration: underline;
+      }
+      .error-message {
+        display: none;
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #dc2626;
+      }
+      @media (max-width: 640px) {
+        .container {
+          margin: 1rem;
+          padding: 1.5rem;
+        }
+        h2 {
+          font-size: 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="index.html">
+        <img src="images/about.jpeg" alt="Unicross Logo" class="logo"
+      /></a>
+      <h2>Unicross Staff Signup</h2>
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Staff Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="staffId">Staff ID</label>
+          <input type="text" id="staffId" name="staffId" required />
+        </div>
+        <div class="form-group">
+          <label for="department">Department</label>
+          <select id="department" name="department" required>
+            <option value="" disabled selected>Select Department</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Business Administration">
+              Business Administration
+            </option>
+            <option value="Education">Education</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            pattern="[0-9]{10,11}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+          />
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="terms" name="terms" required />
+          <label for="terms"
+            >I agree to the
+            <a href="#" class="login-link">Terms and Conditions</a></label
+          >
+        </div>
+        <div class="captcha-group">
+          <label for="captchaInput"
+            >Enter CAPTCHA: <span id="captchaText"></span
+          ></label>
+          <input type="text" id="captchaInput" name="captchaInput" required />
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+      <a href="stafflogin.html" class="login-link"
+        >Already have an account? Login</a
+      >
+      <p id="errorMessage" class="error-message"></p>
+    </div>
+    <script>
+      // Generate CAPTCHA
+      function generateCaptcha() {
+        const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let captcha = "";
+        for (let i = 0; i < 6; i++) {
+          captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        document.getElementById("captchaText").textContent = captcha;
+        return captcha;
+      }
+
+      let currentCaptcha = generateCaptcha();
+
+      document
+        .getElementById("signupForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const fullName = document.getElementById("fullName").value.trim();
+          const email = document.getElementById("email").value;
+          const staffId = document.getElementById("staffId").value.trim();
+          const department = document.getElementById("department").value;
+          const phone = document.getElementById("phone").value;
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+          const terms = document.getElementById("terms").checked;
+          const captchaInput = document.getElementById("captchaInput").value;
+          const errorMessage = document.getElementById("errorMessage");
+
+          // Client-side validation
+          if (fullName.length < 3) {
+            errorMessage.textContent =
+              "Full name must be at least 3 characters";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (!email.includes("@unicross.edu.ng")) {
+            errorMessage.textContent =
+              "Please use a valid Unicross staff email";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (!/^[A-Z0-9]{6,12}$/.test(staffId)) {
+            errorMessage.textContent =
+              "Staff ID must be 6-12 alphanumeric characters";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (!department) {
+            errorMessage.textContent = "Please select a department";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (!/^[0-9]{10,11}$/.test(phone)) {
+            errorMessage.textContent = "Phone number must be 10-11 digits";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (password.length < 6) {
+            errorMessage.textContent = "Password must be at least 6 characters";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (password !== confirmPassword) {
+            errorMessage.textContent = "Passwords do not match";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (!terms) {
+            errorMessage.textContent =
+              "You must agree to the Terms and Conditions";
+            errorMessage.style.display = "block";
+            return;
+          }
+
+          if (captchaInput !== currentCaptcha) {
+            errorMessage.textContent = "Invalid CAPTCHA";
+            errorMessage.style.display = "block";
+            currentCaptcha = generateCaptcha();
+            document.getElementById("captchaInput").value = "";
+            return;
+          }
+
+          // Simulate signup (replace with actual API call)
+          errorMessage.style.display = "none";
+          alert("Signup successful!");
+          this.reset();
+          currentCaptcha = generateCaptcha();
+        });
+    </script>
+  </body>
+</html>
